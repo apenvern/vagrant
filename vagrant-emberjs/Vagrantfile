@@ -1,0 +1,41 @@
+# Pre requis : 
+#    Powershell en version 3 au moins
+#    Invite de commande Powershell lancee en tant qu'administrateur
+#    vagrant plugin install vagrant-proxyconf
+#    vagrant plugin install vagrant-winnfsd
+#    vagrant plugin install vagrant-vbguest
+#    vagrant plugin install vagrant-hosts
+
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure("2") do |config|
+
+  config.vm.box = "ubuntu/trusty64"
+  config.vm.post_up_message = "VM provisioned with Ember ecosystem (git Node.js ember bower-cli)"
+  config.vm.hostname = "vm.ember"
+
+  # Configuration Reseau
+  config.vm.network "private_network", ip: "192.168.56.106", :adapter => 2
+  # Ember default port
+  config.vm.network "forwarded_port", guest: 4200, host: 4200
+  # LiveReload default port
+  config.vm.network "forwarded_port", guest: 49156, host: 49156
+
+  # Configuration VirtualBox
+  config.vm.provider "virtualbox" do |vb|
+      vb.memory = 3072
+      vb.cpus = 1
+  end
+
+  # File Provisioning
+  config.vm.provision "file", source: "smb.conf", destination: "smb.conf"
+
+  # Shell Provisioning
+  config.vm.provision "shell", path: "provision.sh"
+
+end
