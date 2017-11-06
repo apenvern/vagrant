@@ -1,0 +1,4 @@
+---
+java:
+  url: "http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html"
+  arch: "linux-x64"

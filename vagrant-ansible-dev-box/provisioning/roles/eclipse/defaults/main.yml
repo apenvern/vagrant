@@ -1,0 +1,37 @@
+---
+eclipse:
+  url: "http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release"
+  arch: "x86_64"
+  installation_directory: "/opt/eclipse"
+  os: linux
+  gui: "gtk"
+  distro: "oxygen"
+  distros:
+    neon:
+      version: 4.6
+      latest_service_release: 3
+      package: jee
+    oxygen:
+      version: 4.7
+      latest_service_release: 1
+      package: jee
+  plugins:
+    m2eclipse-egit:
+      repositories:
+        - http://repo1.maven.org/maven2/.m2e/connectors/m2eclipse-egit/0.15.0/N/LATEST/
+      install_units:
+        - org.sonatype.m2e.egit.feature.feature.group
+      creates_feature: org.sonatype.m2e.egit.feature_0.15.0
+    m2eclipse-buildhelper:
+      repositories:
+        - http://repo1.maven.org/maven2/.m2e/connectors/m2eclipse-buildhelper/0.15.0/N/0.15.0.201405280027/
+      install_units:
+        - org.sonatype.m2e.buildhelper.feature.feature.group 
+      creates_feature: org.sonatype.m2e.buildhelper.feature_0.15.0
+    m2eclipse-sonarlint:
+      repositories:
+        - https://sonarsource.bintray.com/SonarLint-for-Eclipse/releases/3.2.0/
+      install_units:
+        - org.sonarlint.eclipse.feature.feature.group 
+      creates_feature: org.sonarlint.eclipse.feature_3.2.0
+  download_cache_dir: "/tmp/"

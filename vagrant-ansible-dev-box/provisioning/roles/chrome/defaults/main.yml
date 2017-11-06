@@ -1,0 +1,8 @@
+---
+chrome:
+  repo:
+    file: /etc/apt/sources.list.d/google-chrome.list
+    key: https://dl-ssl.google.com/linux/linux_signing_key.pub
+    url: http://dl.google.com/linux/chrome/deb/
+  deb:
+    url: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb

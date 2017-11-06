@@ -1,0 +1,3 @@
+---
+nodejs:
+  url: "https://deb.nodesource.com/setup_8.x"

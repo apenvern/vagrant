@@ -1,0 +1,29 @@
+---
+- name: install maven
+  apt: 
+    name: maven
+    state: latest 
+    update_cache: yes 
+    cache_valid_time: 3600
+  register: mvn_install
+  become: yes
+
+- name: Add Maven configuration to the user path
+  blockinfile:
+    path: /etc/profile.d/mvn-env.sh
+    create: yes
+    mode: 0755
+    block: |
+      export MAVEN_OPTS=-Dmaven.wagon.http.ssl.insecure=true
+  become: yes
+
+- name: Ensures .m2 dir exists
+  file: path="/home/{{ ansible_user }}/.m2/" state=directory
+
+- name: Copie du fichier de configuration de Maven
+  copy:
+    src: "{{ role_path }}/files/settings.xml"
+    dest: "/home/{{ ansible_user }}/.m2/settings.xml"
+    owner: "{{ ansible_user }}"
+    mode: 0644
+...

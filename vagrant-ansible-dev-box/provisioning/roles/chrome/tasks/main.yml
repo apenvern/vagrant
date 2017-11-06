@@ -1,0 +1,33 @@
+---
+- name: Check if google-chrome-stable is installed
+  command: dpkg -s google-chrome-stable
+  register: google_chrome_check_deb
+  failed_when: google_chrome_check_deb.rc > 1
+  changed_when: google_chrome_check_deb == 1
+  tags:
+    - chrome
+
+- name: Download google-chrome-stable
+  get_url:
+    url: "{{chrome.deb.url}}"
+    dest: "/tmp/chrome.deb"
+  when: google_chrome_check_deb.rc == 1
+  tags:
+    - chrome
+
+- name: Install google-chrome-stable
+  apt:
+    deb: "/tmp/chrome.deb"
+  become: yes
+  when: google_chrome_check_deb.rc == 1
+  tags:
+    - chrome
+
+- name: Fix any missing google-chrome-stable dependencies
+  shell: apt-get install -f
+  become: yes
+  when: google_chrome_check_deb.rc == 1
+  tags:
+    - chrome
+
+...

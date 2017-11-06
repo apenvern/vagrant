@@ -1,0 +1,28 @@
+---
+- name: Install OpenJdk
+  apt:
+    name: "{{ openjdk.version }}"
+    state: latest
+    update_cache: yes
+    cache_valid_time: 3600
+  register: jdk_install
+  become: yes
+
+- name: Set java version
+  alternatives:
+    name: java
+    link: /usr/bin/java
+    path: "{{ openjdk.installdir }}/bin/java"
+    priority: 100
+  become: yes
+
+- name: Add JAVA_HOME to the user path
+  blockinfile:
+    path: /etc/profile.d/java-env.sh
+    create: yes
+    mode: 0755
+    block: |
+      export JAVA_HOME="{{ openjdk.installdir }}"
+      export PATH=$JAVA_HOME/bin:$PATH
+  become: yes
+...

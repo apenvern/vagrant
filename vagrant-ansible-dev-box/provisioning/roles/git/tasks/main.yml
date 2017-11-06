@@ -1,0 +1,20 @@
+---
+
+- name: install git
+  apt: 
+    name: git
+    state: latest 
+    update_cache: yes 
+    cache_valid_time: 3600
+  register: git_install
+  become: yes
+
+- name: Set the Git configuration
+  git_config:
+    name: "{{ item.name }}"
+    scope: "{{ item.scope }}"
+    value: "{{ item.value }}"
+  with_items:
+    - "{{ gitconfig }}"
+
+...

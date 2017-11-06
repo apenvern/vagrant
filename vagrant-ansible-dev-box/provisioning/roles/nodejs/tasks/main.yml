@@ -1,0 +1,19 @@
+---
+- name: Get nodejs repo file configuration
+  get_url:
+    url: "{{ nodejs.url }}"
+    dest: /tmp/nodejs-install.sh
+    mode: 0755
+
+- name: Execute the repo file configuration
+  script: /tmp/nodejs-install.sh
+  become: yes
+
+- name: Install nodejs
+  apt:
+    name: nodejs
+    state: latest
+    update_cache: yes
+    cache_valid_time: 3600
+  become: yes
+...

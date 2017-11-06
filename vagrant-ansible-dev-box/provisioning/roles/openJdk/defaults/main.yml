@@ -1,0 +1,4 @@
+---
+openjdk:
+  version: "openjdk-8-jdk"
+  installdir: "/usr/lib/jvm/java-1.8.0-openjdk-amd64"

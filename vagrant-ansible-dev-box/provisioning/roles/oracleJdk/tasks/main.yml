@@ -1,0 +1,60 @@
+---
+- name: Ensures /opt/java dir exists
+  file: path=/opt/java state=directory
+  become: yes
+
+- name: Get the Oracle download page
+  get_url:
+    url: "{{ java.url }}"
+    dest: /tmp/oracle_dl.html
+
+- name: Extract url of Jdk
+  shell: awk "/downloads\['/ && ! /demos/ && /\['files'\]/ && /"{{ java.arch }}"/ && /\.tar\.gz/" /tmp/oracle_dl.html | grep -o 'http.*\.tar\.gz' | sort -n | tail -1
+  args:
+    executable: /bin/bash
+  register: dl_url
+
+- name: Ensures /tmp/java dir exists
+  file: path=/tmp/java state=directory
+
+- name: Download Jdk
+  get_url:
+    url: "{{ dl_url.stdout }}"
+    dest: /tmp/java
+    headers: "Cookie: oraclelicense=accept-securebackup-cookie"
+  register: archive
+
+- name: Unarchive Jdk
+  unarchive:
+    src: "{{ archive.dest }}"
+    dest: /opt/java/
+  become: yes
+  register: unarchive
+
+- name: Extract the version off Jdk
+  command: tar --exclude="*/*" -tf {{ archive.dest }}
+  register: jdk_folder
+
+- name: Set java version
+  alternatives:
+    name: java
+    link: /usr/bin/java
+    path: /opt/java/{{ jdk_folder.stdout }}/bin/java
+    priority: 100
+  become: yes
+
+- name: Add JAVA_HOME to the user path
+  blockinfile:
+    path: /etc/profile.d/java-env.sh
+    create: yes
+    mode: 0755
+    block: |
+      export JAVA_HOME=/opt/java/{{ jdk_folder.stdout }}
+      export PATH=$JAVA_HOME/bin:$PATH
+  become: yes
+
+- name: Delete archive
+  file:
+    path: /java/tmp
+    state: absent
+...

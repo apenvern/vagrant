@@ -1,0 +1,15 @@
+---
+
+- hosts: all, localhost
+
+  roles:
+    #- gnome
+    #- unix-tools
+    #- openJdk
+    #- git
+    #- nodejs
+    #- maven
+    - eclipse
+    - chrome
+
+...

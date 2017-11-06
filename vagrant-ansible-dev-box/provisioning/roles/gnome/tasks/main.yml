@@ -1,0 +1,40 @@
+---
+
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+  become: yes
+
+- name: Configure Gnome repository
+  apt_repository:
+    repo: 'ppa:gnome3-team/gnome3'
+  become: yes
+
+- name: Run the equivalent of "apt-get update" as a separate step
+  apt:
+    update_cache: yes
+  become: yes
+
+- name: install gnome-shell
+  apt:
+    name: gnome-shell
+    state: latest
+    update_cache: yes
+    cache_valid_time: 3600
+  become: yes
+
+- name: install ubuntu-desktop
+  apt:
+    name: ubuntu-desktop
+    state: latest
+    update_cache: yes
+    cache_valid_time: 3600
+  become: yes
+
+- name: install lightdm
+  apt:
+    name: lightdm
+    state: latest
+    update_cache: yes
+    cache_valid_time: 3600
+  become: yes

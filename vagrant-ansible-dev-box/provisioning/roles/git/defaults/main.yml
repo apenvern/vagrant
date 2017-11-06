@@ -1,0 +1,12 @@
+
+---
+gitconfig:
+  - name: core.autocrlf
+    scope: global
+    value: input
+  - name: "url.\"https://\".insteadof"
+    scope: global
+    value: "git://"
+  - name: http.sslVerify
+    scope: global
+    value: false

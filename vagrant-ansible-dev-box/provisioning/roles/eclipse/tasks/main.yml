@@ -1,0 +1,77 @@
+---
+- name: set eclipse vars from defaults or settings
+  set_fact:
+    eclipse_arch: "{{eclipse.arch}}"
+    eclipse_distro: "{{eclipse.distro}}"
+    eclipse_gui: "{{eclipse.gui}}"
+    eclipse_os: "{{eclipse.os}}"
+    eclipse_package: "{{eclipse.distros[eclipse.distro].package}}"
+    eclipse_update: "{{eclipse.distros[eclipse.distro].latest_service_release}}"
+    eclipse_url: "{{eclipse.url}}"
+  failed_when: eclipse_distro not in eclipse.distros
+
+- name: set name of tar file
+  set_fact:
+    eclipse_file_tar: "eclipse-{{ eclipse_package }}-{{ eclipse_distro }}-{{ eclipse_update }}-{{ eclipse_os }}{{ '-' ~ eclipse_gui if eclipse_gui }}{{ '-' ~ eclipse_arch if eclipse_arch }}.tar.gz"
+
+- name: set packages download url, destination path and install directory
+  set_fact:
+    eclipse_download_url: "{{eclipse_url}}/{{eclipse_distro}}/{{eclipse_update}}/{{eclipse_file_tar}}&r=1"
+    eclipse_package_download_path: "{{ eclipse.download_cache_dir }}/{{ eclipse_file_tar }}"
+
+- name: set eclipse installation directory
+  set_fact:
+    eclipse_install_dir: "{{eclipse.installation_directory ~ '-' ~ eclipse.distro}}"
+
+- name: set name of unpacked eclipse directory
+  set_fact:
+    eclipse_unpack_dir: "{{ eclipse_install_dir ~ '/eclipse'}}"
+    eclipse_ini_path: "{{ eclipse_install_dir ~ '/eclipse/eclipse.ini' }}"
+
+- name: create install directory
+  file:
+    dest: "{{ eclipse_install_dir }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+  become: yes  
+
+- name: download eclipse archive
+  get_url:
+    url:  "{{ eclipse_download_url }}"
+    dest: "{{ eclipse_package_download_path}}"
+
+- name: unpack eclipse archives
+  unarchive:
+    src: "{{ eclipse_package_download_path }}"
+    dest: "{{ eclipse_install_dir }}"
+    creates: "{{ eclipse_ini_path }}"
+
+- name: add eclipse icon to gnome start menu
+  template:
+    src: eclipse.desktop.j2
+    dest: /usr/share/applications/eclipse.desktop
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0644
+  become: yes  
+
+- name: create plugins install command
+  set_fact:
+    plugin_install_command: "{{ eclipse_unpack_dir }}/eclipse -nosplash \
+      -application org.eclipse.equinox.p2.director \
+      -destination {{ eclipse_unpack_dir}} \
+      {{ '-p2.os '   ~ eclipse_os  if eclipse_os  }} \
+      {{ '-p2.ws '   ~ eclipse_gui if eclipse_gui }} \
+      {{ '-p2.arch ' ~ ansible_architecture if ansible_architecture }}"
+
+- name: install eclipse plugins
+  command: "{{ plugin_install_command }} \
+    -repository \
+    {{ (['http://download.eclipse.org/releases/' + eclipse_distro] + eclipse.plugins[item].repositories) | join(',') }} \
+    -installIU \
+    {{ eclipse.plugins[item].install_units | join(',') }} \
+    -tag ansible_install_plugin_{{ item }}"
+  args:
+    creates: "{{ eclipse_unpack_dir}}/*/{{ eclipse.plugins[item].creates_feature }}*"
+  with_items: '{{ eclipse.plugins }}'
+  when: (eclipse.plugins[item] is defined)
