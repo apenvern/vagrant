@@ -1,0 +1,27 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  # Machine settings : http://chef.github.io/bento/
+  config.vm.box = "bento/ubuntu-18.10"
+  config.vm.post_up_message = "Box for Ubuntu with Gnome Desktop"
+  config.vm.hostname = "ubuntu.desktop.box"
+  config.vbguest.auto_update = true
+
+  # Set memory for the default VM
+  config.vm.provider "virtualbox" do |vb|
+    vb.customize ["modifyvm", :id, "--vram", "32"]
+    vb.memory = "4096"
+    vb.gui = true
+    vb.cpus = 2
+  end
+
+  # And finally run the Ansible local provisioner
+  config.vm.provision "ansible_local" do |ansible|
+    ansible.provisioning_path = "/vagrant/provisioning"
+    ansible.playbook = "playbook.yml"
+    ansible.limit = "all"
+    ansible.install_mode = "pip"
+  end
+
+end

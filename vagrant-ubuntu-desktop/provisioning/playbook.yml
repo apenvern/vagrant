@@ -1,0 +1,6 @@
+---
+
+- hosts: all, localhost
+
+  roles:
+    - gnome
