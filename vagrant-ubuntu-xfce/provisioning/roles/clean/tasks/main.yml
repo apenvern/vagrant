@@ -1,0 +1,17 @@
+---
+
+- name: Remove useless packages from the cache
+  apt:
+    autoclean: yes
+  become: yes
+
+- name: Remove dependencies that are no longer required
+  apt:
+    autoremove: yes
+  become: yes
+
+- name: "Reduce footprint "
+  shell: |
+    dd if=/dev/zero of=/EMPTY bs=1M
+    rm -f /EMPTY
+  become: yes

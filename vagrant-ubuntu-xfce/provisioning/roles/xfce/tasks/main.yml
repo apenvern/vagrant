@@ -1,0 +1,24 @@
+---
+
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+  become: yes
+
+- name: Run the equivalent of "apt-get update" as a separate step
+  apt:
+    update_cache: yes
+  become: yes
+
+- name: Install xfce4 Desktop 
+  apt:
+    name: ['xfce4', 'lightdm', 'lightdm-gtk-greeter']
+    state: latest
+    update_cache: yes
+    cache_valid_time: 3600
+  become: yes
+
+- name: "Permit anyone to start the GUI"
+  shell: >
+    sed -i 's/allowed_users=.*$/allowed_users=anybody/' /etc/X11/Xwrapper.config
+  become: yes
